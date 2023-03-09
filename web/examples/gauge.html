@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <title>Netdata WAMP TV</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/autobahn/22.10.1/autobahn.min.js"
+            integrity="sha512-NV3SvHAZNmkfgYNYbooVfXPHOXSxozk0TJALPt9J2xk1cVwp0YnTw5k3W6IClirda/A9DspvjeBqxmgPvdus+w=="
+            crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/echarts/5.4.1/echarts.min.js"
+            integrity="sha512-OTbGFYPLe3jhy4bUwbB8nls0TFgz10kn0TLkmyA+l3FyivDs31zsXCjOis7YGDtE2Jsy0+fzW+3/OVoPVujPmQ=="
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/picocss/1.5.7/pico.min.css"
+          integrity="sha512-1VnpjjanhjGWRcbZCUKqh1KbNIGAd8aqsokcHUNlBFM3CfAUasd7D0h1luMzyS01W74K4zUZq7GZnj3yoGYEFQ=="
+          crossorigin="anonymous">
+    </style>
+    <style>
+        :root {
+            --grid-spacing-vertical: 0 !important;
+            --grid-spacing-horizontal: 0 !important;
+            --form-element-spacing-vertical: 0.2rem !important;
+            --form-element-spacing-horizontal: .25rem !important;
+        }
+
+        html,
+        body {
+            height: 100%;
+            min-height: 100%;
+            max-width: 100%;
+            background-color: #171b20;
+        }
+
+        [data-netdata] {
+            min-height: 16rem;
+        }
+
+        [data-type^=spark] {
+            min-height: 8rem;
+        }
+    </style>
+    <script src="/chart.js"></script>
+</head>
+
+<body class="grid">
+<div data-host="cha00101">
+    <h1>cha00101</h1>
+    <div class="grid">
+        <div>
+            <div data-netdata="system.cpu" data-type="pie" data-max="100"></div>
+            <div data-netdata="system.ram" data-type="pie"></div>
+        </div>
+        <div>
+            <div data-netdata="system.cpu" data-group="sync" data-type="sparkline" data-max="100" data-stack="true"></div>
+            <div data-netdata="system.ram" data-group="sync" data-type="sparkline" data-stack="true"></div>
+        </div>
+    </div>
+    <div data-netdata="system.cpu" data-group="sync" data-type="line" data-max="100"></div>
+    <div data-netdata="system.ram" data-group="sync" data-type="line" data-stack="true"></div>
+    <div data-netdata="system.io" data-group="sync" data-type="line"></div>
+    <div data-netdata="system.ctxt" data-group="sync" data-type="line"></div>
+</div>
+<div data-host="cha00102">
+    <h1>cha00102</h1>
+    <div class="grid">
+        <div>
+            <div data-netdata="system.cpu" data-type="pie" data-max="100"></div>
+            <div data-netdata="system.ram" data-type="pie"></div>
+        </div>
+        <div>
+            <div data-netdata="system.cpu" data-group="sync" data-type="sparkline" data-max="100" data-stack="true"></div>
+            <div data-netdata="system.ram" data-group="sync" data-type="sparkline" data-stack="true"></div>
+        </div>
+    </div>
+    <div data-netdata="system.cpu" data-group="sync" data-type="line" data-max="100"></div>
+    <div data-netdata="system.ram" data-group="sync" data-type="line" data-stack="true"></div>
+    <div data-netdata="system.io" data-group="sync" data-type="line"></div>
+    <div data-netdata="system.ctxt" data-group="sync" data-type="line"></div>
+</div>
+<div data-host="cha00103">
+    <h1>cha00103</h1>
+    <div class="grid">
+        <div>
+            <div data-netdata="system.cpu" data-type="pie" data-max="100"></div>
+            <div data-netdata="system.ram" data-type="pie"></div>
+        </div>
+        <div>
+            <div data-netdata="system.cpu" data-group="sync" data-type="sparkline" data-max="100" data-stack="true"></div>
+            <div data-netdata="system.ram" data-group="sync" data-type="sparkline" data-stack="true"></div>
+        </div>
+    </div>
+    <div data-netdata="system.cpu" data-group="sync" data-type="line" data-max="100"></div>
+    <div data-netdata="system.ram" data-group="sync" data-type="line" data-stack="true"></div>
+    <div data-netdata="system.io" data-group="sync" data-type="line"></div>
+    <div data-netdata="system.ctxt" data-group="sync" data-type="line"></div>
+</div>
+</body>
+
+</html>

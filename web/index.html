@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <title>Netdata WAMP TV</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        :root {
+            --form-element-spacing-vertical: 0.2rem !important;
+            --form-element-spacing-horizontal: .25rem !important;
+        }
+
+        html, body, [x-data=app] {
+            height: 100%;
+            min-height: 100%;
+        }
+
+        [x-data=app] {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+    </style>
+    <script src="/index.js"></script>
+</head>
+
+<body>
+<div x-data="app">
+    <div class="netdata-charts">
+        <div class="grid">
+            <div>foo</div>
+            <div>bar</div>
+        </div>
+        <div class="grid">
+            <div x-netdata data-chart="system.cpu" data-host="localhost:19999" style="width:100%;"></div>
+            <div x-netdata data-chart="system.ram" data-host="localhost:19999" style="width:100%;"></div>
+        </div>
+    </div>
+    <div class="netdata-controls">
+        <div>
+            <template x-bind="runStart">
+               <span x-bind="runStartClick">
+                  <span class="fa fa-play"></span>
+                  Start
+               </span>
+            </template>
+            <template x-bind="runStop">
+               <span x-bind="runStopClick">
+                  <span class="fa fa-square"></span>
+                  Stop
+               </span>
+            </template>
+            <span class="grid">
+               <label>
+                  Duration:
+                  <input type="number" min="1" step="1" x-model="$store.app.duration"/>
+               </label>
+               <label>
+                  From:
+                  <input type="datetime-local" step="1" x-model="$store.app.dateFrom"/>
+               </label>
+               <label>
+                  Until:
+                  <input type="datetime-local" step="1" x-model="$store.app.dateUntil"/>
+               </label>
+            </span>
+        </div>
+        <div>
+            <code x-text="$store.app.running"></code>
+            <code x-text="$store.app.duration"></code>
+            <code x-text="$store.app.dateFrom"></code>
+            <code x-text="$store.app.dateUntil"></code>
+        </div>
+    </div>
+</div>
+</body>
