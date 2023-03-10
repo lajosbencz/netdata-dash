@@ -23,15 +23,19 @@ func (r *StringsUnique) Add(list ...string) int {
 	return n
 }
 
-func (r *StringsUnique) Remove(str string) bool {
-	if !r.Has(str) {
-		return false
-	}
-	for k, v := range *r {
-		if v == str {
-			(*r) = append((*r)[:k], (*r)[k+1:]...)
-			break
+func (r *StringsUnique) Remove(list ...string) int {
+	n := 0
+	for _, str := range list {
+		if !r.Has(str) {
+			continue
 		}
+		for k, v := range *r {
+			if v == str {
+				(*r) = append((*r)[:k], (*r)[k+1:]...)
+				break
+			}
+		}
+		n++
 	}
-	return true
+	return n
 }

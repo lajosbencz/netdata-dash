@@ -138,7 +138,7 @@ class Chart {
     }
 
     static Highlight(obj, dataIndex, seriesIndex) {
-        if(obj.group.length < 1) {
+        if (obj.group.length < 1) {
             return
         }
         obj.is_highlighted = true
@@ -152,7 +152,7 @@ class Chart {
     }
 
     static Downplay(obj) {
-        if(obj.group.length < 1) {
+        if (obj.group.length < 1) {
             return
         }
         obj.is_highlighted = false
@@ -181,7 +181,7 @@ class Chart {
         this.host = this.options.host + ":" + this.options.port
         this.group = this.options.group
         this.data = []
-        this.chart = echarts.init(this.el, this.options.theme, {renderer: 'canvas'})
+        this.chart = echarts.init(this.el, this.options.theme, { renderer: 'canvas' })
         Chart.AllCharts.push(this)
         const chartOptions = {
             backgroundColor: 'transparent',
@@ -248,7 +248,7 @@ class Chart {
         this.disposeCallbacks.push(callback)
     }
 
-    isInViewport () {
+    isInViewport() {
         const rect = this.el.getBoundingClientRect()
         const h = window.innerHeight || document.documentElement.clientHeight
         const w = window.innerWidth || document.documentElement.clientWidth
@@ -514,4 +514,5 @@ window.addEventListener('load', async () => {
     abConnection.open()
     const abSession = await deferSession
     document.querySelectorAll('body [data-netdata]').forEach(createChart(abSession))
+
 })

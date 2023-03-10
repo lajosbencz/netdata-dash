@@ -45,6 +45,9 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	if !cli.HasFeature("broker", wamp.FeatureSubMetaAPI) {
+		log.Fatal("Broker does not have", wamp.FeatureSubMetaAPI, "feature")
+	}
 	if !cli.HasFeature("broker", wamp.FeatureSessionMetaAPI) {
 		log.Fatal("Broker does not have", wamp.FeatureSessionMetaAPI, "feature")
 	}

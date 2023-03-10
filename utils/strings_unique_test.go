@@ -20,10 +20,10 @@ func TestStringsUnique(t *testing.T) {
 	if !s.Has("bar") {
 		t.Fail()
 	}
-	if !s.Remove("bar") {
+	if s.Remove("bar") != 1 {
 		t.Fail()
 	}
-	if s.Remove("bar") {
+	if s.Remove("bar") != 0 {
 		t.Fail()
 	}
 	if len(s) != 1 {

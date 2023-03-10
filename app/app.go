@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -35,6 +34,7 @@ func (r *App) Close() error {
 }
 
 func (r *App) onSubscribe(event *wamp.Event) {
+	log.Printf("onSubscribe %#v\n", event)
 	if len(event.Arguments) != 0 {
 		if details, ok := wamp.AsDict(event.Arguments[0]); ok {
 			sessionID, _ := wamp.AsID(details["session"])
@@ -44,7 +44,7 @@ func (r *App) onSubscribe(event *wamp.Event) {
 			if strings.HasPrefix(topic, "chart.data.") {
 				hostName, metricName, ok := r.topics.Unhash(topic[11:])
 				if !ok {
-					fmt.Println(errors.New("failed to unhash topic: " + topic))
+					log.Println(errors.New("failed to unhash topic: " + topic))
 				}
 				r.registrations.Register(sessionID, hostName, metricName)
 				log.Printf("client: %v\nhost: %s\nmetric: %s\n", sessionID, hostName, metricName)
@@ -54,6 +54,7 @@ func (r *App) onSubscribe(event *wamp.Event) {
 }
 
 func (r *App) onUnsubscribe(event *wamp.Event) {
+	log.Printf("onUnsubscribe %#v\n", event)
 	if len(event.Arguments) != 0 {
 		if details, ok := wamp.AsDict(event.Arguments[0]); ok {
 			sessionID, _ := wamp.AsID(details["session"])
@@ -65,6 +66,7 @@ func (r *App) onUnsubscribe(event *wamp.Event) {
 }
 
 func (r *App) onSessionLeave(event *wamp.Event) {
+	log.Printf("onSessionLeave %#v\n", event)
 	if len(event.Arguments) != 0 {
 		if details, ok := wamp.AsDict(event.Arguments[0]); ok {
 			sessionID, _ := wamp.AsID(details["session"])
