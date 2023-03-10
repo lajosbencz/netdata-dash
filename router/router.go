@@ -71,8 +71,10 @@ func NewRouter(realm string, wsHost string, wsPort int, tcpHost string, tcpPort 
 	}
 	wss.EnableTrackingCookie = true
 	wss.KeepAlive = 30 * time.Second
-	rss := router.NewRawSocketServer(nxr)
-
+	var rss *router.RawSocketServer
+	if tcpPort > 0 {
+		rss = router.NewRawSocketServer(nxr)
+	}
 	// Start servers
 	wsAddr := fmt.Sprintf("%s:%d", wsHost, wsPort)
 	newRouter.HttpListenAddress = wsAddr
@@ -84,13 +86,15 @@ func NewRouter(realm string, wsHost string, wsPort int, tcpHost string, tcpPort 
 	//newRouter.wsCloser = wsCloser
 	log.Printf("Websocket server listening on ws://%s/", wsAddr)
 
-	tcpAddr := fmt.Sprintf("%s:%d", tcpHost, tcpPort)
-	tcpCloser, err := rss.ListenAndServe("tcp", tcpAddr)
-	if err != nil {
-		return nil, err
+	if tcpPort > 0 {
+		tcpAddr := fmt.Sprintf("%s:%d", tcpHost, tcpPort)
+		tcpCloser, err := rss.ListenAndServe("tcp", tcpAddr)
+		if err != nil {
+			return nil, err
+		}
+		newRouter.tcpCloser = tcpCloser
+		log.Printf("RawSocket TCP server listening on tcp://%s/", tcpAddr)
 	}
-	newRouter.tcpCloser = tcpCloser
-	log.Printf("RawSocket TCP server listening on tcp://%s/", tcpAddr)
 
 	return newRouter, nil
 }

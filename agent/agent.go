@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"fmt"
+	"github.com/gammazero/nexus/v3/client"
 	"log"
 	"time"
 
@@ -11,29 +12,33 @@ import (
 )
 
 type Agent struct {
+	HostName    string
 	Config      *Config
 	metricsList utils.StringsUnique
 	chartsData  netdata.ApiDataCharts
+	wampClient  *client.Client
 }
 
-func NewAgent(config *Config) (*Agent, error) {
+func NewAgent(hostName string, config *Config, wampClient *client.Client) (*Agent, error) {
 	if config == nil {
 		config = DefaultConfig()
 	}
 	a := &Agent{
+		HostName:    hostName,
 		Config:      config,
 		metricsList: utils.StringsUnique{},
 		chartsData:  netdata.ApiDataCharts{},
+		wampClient:  wampClient,
 	}
 	return a, nil
 }
 
 func (r *Agent) RouterAddress() string {
-	return fmt.Sprintf("%s:%d", r.Config.RouterHost, r.Config.RouterPort)
+	return fmt.Sprintf("%s:%d", r.Config.Router.Host, r.Config.Router.Port)
 }
 
 func (r *Agent) NetdataAddress() string {
-	return fmt.Sprintf("%s:%d", r.Config.NetdataHost, r.Config.NetdataPort)
+	return fmt.Sprintf("%s:%d", r.Config.Netdata.Host, r.Config.Netdata.Port)
 }
 
 func (r *Agent) UpdateCharts() error {

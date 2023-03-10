@@ -1,17 +1,52 @@
 package agent
 
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"os"
+)
+
+type Address struct {
+	Host string `json:"host,omitempty"`
+	Port int    `json:"port,omitempty"`
+}
+
+func (r Address) Format() string {
+	return fmt.Sprintf("%s:%d", r.Host, r.Port)
+}
+
 type Config struct {
-	RouterHost  string
-	RouterPort  int
-	NetdataHost string
-	NetdataPort int
+	HostName string  `json:"hostname,omitempty"`
+	Realm    string  `json:"realm,omitempty"`
+	Router   Address `json:"router,omitempty"`
+	Netdata  Address `json:"netdata,omitempty"`
 }
 
 func DefaultConfig() *Config {
 	return &Config{
-		RouterHost:  "localhost",
-		RouterPort:  16666,
-		NetdataHost: "localhost",
-		NetdataPort: 19999,
+		HostName: "localhost",
+		Realm:    "netdata",
+		Router: Address{
+			Host: "localhost",
+			Port: 16666,
+		},
+		Netdata: Address{
+			Host: "localhost",
+			Port: 19999,
+		},
 	}
+}
+
+func (r *Config) FromFile(jsonPath string) error {
+	if _, err := os.Stat(jsonPath); err == nil {
+		fh, err := os.Open(jsonPath)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		if err := json.NewDecoder(fh).Decode(r); err != nil {
+			log.Fatalln(err)
+		}
+	}
+	return nil
 }

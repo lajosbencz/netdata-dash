@@ -14,20 +14,16 @@ import (
 
 func main() {
 	var (
-		realm   = "netdata"
-		wsHost  = "0.0.0.0"
-		tcpHost = "0.0.0.0"
-		wsPort  = 9301
-		tcpPort = 9302
+		realm  = "netdata"
+		wsHost = "0.0.0.0"
+		wsPort = 16666
 	)
 	flag.StringVar(&realm, "realm", realm, "realm")
 	flag.StringVar(&wsHost, "ws-host", wsHost, "websocket host")
 	flag.IntVar(&wsPort, "ws-port", wsPort, "websocket port")
-	flag.StringVar(&tcpHost, "tcp-host", tcpHost, "TCP host")
-	flag.IntVar(&tcpPort, "tcp-port", tcpPort, "TCP port")
 	flag.Parse()
 
-	rtr, err := router.NewRouter(realm, wsHost, wsPort, tcpHost, tcpPort)
+	rtr, err := router.NewRouter(realm, wsHost, wsPort, "127.0.0.1", 0)
 	if err != nil {
 		log.Fatalln(err)
 	}
