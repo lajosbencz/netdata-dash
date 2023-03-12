@@ -72,8 +72,6 @@ func ApiCharts(hostName string) (*HostData, error) {
 	if err := json.NewDecoder(res.Body).Decode(&d); err != nil {
 		return nil, err
 	}
-	// log.Println(url)
-	// log.Printf("%#v\n", *d)
 	return d, nil
 }
 

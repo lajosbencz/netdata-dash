@@ -1,21 +1,16 @@
-.PHONY: dev dev-agent
+.PHONY: all clean dash
 
-all: dash dash-agent
+# LDFLAGS := "-w -s"
+LDFLAGS := ""
+SRCDIR := ./make
+DISTDIR := ./dist
+SOURCES := $(wildcard $(SRCDIR)/*)
+OBJECTS := $(SOURCES:$(SRCDIR)/%=$(DISTDIR)/%)
 
-dash:
-	go build ./make/netdata-dash/
+all: $(OBJECTS)
 
-dash-agent:
-	go build ./make/netdata-dash-agent/
+$(DISTDIR)/%: $(SRCDIR)/%
+	go build -ldflags $(LDFLAGS) -o $@ "./$<"
 
-dash-client:
-	go build ./make/netdata-dash-client/
-
-dev:
-	go run ./make/netdata-dash/
-
-dev-agent:
-	go run ./make/netdata-dash-agent/
-
-dev-client:
-	go run ./make/netdata-dash-client/
+clean:
+	rm -f $(DISTDIR)/*

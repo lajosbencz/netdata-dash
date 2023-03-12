@@ -3,6 +3,7 @@ package agent
 import (
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 
 	"github.com/gammazero/nexus/v3/wamp"
@@ -42,10 +43,36 @@ func (r *Agent) Run() error {
 						return err
 					}
 				}
-				r.logger.Printf("published %d metrics\n", len(r.metricsList))
+				r.logger.Printf("<%d\n", len(r.metricsList))
 			}
 			if err := r.wampClient.Publish(core.TopicHostHeartbeat(r.HostName), nil, nil, nil); err != nil {
 				return err
+			}
+		}
+	}
+}
+
+func (r *Agent) onSubCreate(event *wamp.Event) {
+	if len(event.Arguments) > 1 {
+		if details, ok := wamp.AsDict(event.Arguments[1]); ok {
+			subID, _ := wamp.AsID(details["id"])
+			topic, _ := wamp.AsString(details["uri"])
+			if strings.HasPrefix(topic, core.TopicChartDataHostPrefix(r.HostName)) {
+				parts := strings.SplitN(topic, core.TopicPartDelimiter, 3)
+				var metricName string = parts[2]
+				r.topicIds[subID] = metricName
+				_ = r.Watch(metricName)
+			}
+		}
+	}
+}
+
+func (r *Agent) onSubDelete(event *wamp.Event) {
+	if len(event.Arguments) > 1 {
+		if subID, ok := wamp.AsID(event.Arguments[1]); ok {
+			if metricName, ok := r.topicIds[subID]; ok {
+				r.Unwatch(metricName)
+				delete(r.topicIds, subID)
 			}
 		}
 	}

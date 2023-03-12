@@ -1,4 +1,3 @@
 .idea/
 
-/netdata-dash
-/netdata-dash-agent
+/dist/

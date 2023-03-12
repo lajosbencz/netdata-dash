@@ -53,3 +53,11 @@ func (r *Config) FromFile(jsonPath string) error {
 	}
 	return nil
 }
+
+func (r *Config) DashAddress() string {
+	return fmt.Sprintf("%s:%d", r.Dash.Host, r.Dash.Port)
+}
+
+func (r *Config) NetdataAddress() string {
+	return fmt.Sprintf("%s:%d", r.Netdata.Host, r.Netdata.Port)
+}

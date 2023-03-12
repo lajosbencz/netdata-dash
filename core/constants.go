@@ -3,6 +3,7 @@ package core
 const (
 	TopicPartDelimiter = "._."
 
+	TopicHostList            = "host.list"
 	TopicHostJoin            = "host.join"
 	TopicHostLeave           = "host.leave"
 	TopicHostHeartbeatPrefix = "host.heartbeat"

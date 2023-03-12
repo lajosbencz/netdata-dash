@@ -11,8 +11,9 @@ import (
 	"github.com/gammazero/nexus/v3/wamp"
 )
 
-func newWamp(realm string) (router.Router, *client.Client, *router.WebsocketServer, error) {
+func newWamp(realm string, logger *log.Logger) (router.Router, *client.Client, *router.WebsocketServer, error) {
 	routerConfig := &router.Config{
+		Debug: false,
 		RealmConfigs: []*router.RealmConfig{
 			{
 				URI:           wamp.URI(realm),
@@ -27,7 +28,9 @@ func newWamp(realm string) (router.Router, *client.Client, *router.WebsocketServ
 	}
 
 	wampConfig := client.Config{
-		Realm: realm,
+		Debug:  false,
+		Realm:  realm,
+		Logger: logger,
 	}
 	wampClient, err := client.ConnectLocal(wampRouter, wampConfig)
 	if err != nil {

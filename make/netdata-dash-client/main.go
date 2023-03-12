@@ -74,7 +74,7 @@ func main() {
 	}
 
 	if len(metricList) == 0 {
-		metricList = append(metricList, "system.cpu", "system.ram")
+		metricList = append(metricList, "system.cpu", "system.ram", "system.ctxt")
 	}
 	hostList := getHostList(wampClient)
 	log.Printf("initial host list: %#v\n", hostList)

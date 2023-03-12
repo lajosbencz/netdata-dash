@@ -27,7 +27,7 @@ func main() {
 	flag.StringVar(&agentName, "agent", agentName, "run local agent with provided hostname")
 	flag.Parse()
 
-	wampRouter, wampClient, wampServer, err := newWamp(realm)
+	wampRouter, wampClient, wampServer, err := newWamp(realm, log.Default())
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -55,7 +55,7 @@ func main() {
 
 	myApp := app.NewApp(wampClient)
 	go func() {
-		if err := myApp.RunLoop(); err != nil {
+		if err := myApp.RunLoop(shutdown); err != nil {
 			failed <- err
 		}
 	}()
