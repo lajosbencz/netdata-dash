@@ -1,13 +1,21 @@
-all: netdata-dash netdata-dash-agent
+.PHONY: dev dev-agent
 
-netdata-dash-agent:
-	go build ./netdata-dash-agent/
+all: dash dash-agent
 
-netdata-dash:
-	go build .
+dash:
+	go build ./make/netdata-dash/
+
+dash-agent:
+	go build ./make/netdata-dash-agent/
+
+dash-client:
+	go build ./make/netdata-dash-client/
 
 dev:
-	go run .
+	go run ./make/netdata-dash/
 
 dev-agent:
-	go run ./netdata-dash-agent/
+	go run ./make/netdata-dash-agent/
+
+dev-client:
+	go run ./make/netdata-dash-client/

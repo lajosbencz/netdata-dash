@@ -3,10 +3,12 @@ package netdata
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
 
+	"github.com/gammazero/nexus/v3/wamp"
 	"github.com/lajosbencz/netdata-dash/core"
 )
 
@@ -21,8 +23,20 @@ type Metric struct {
 
 type AllMetrics map[string]Metric
 
+func MetricFromWampDict(dict wamp.Dict) Metric {
+	r := Metric{}
+	if d, err := json.Marshal(dict); err == nil {
+		if err = json.Unmarshal(d, &r); err != nil {
+			log.Println(err)
+		}
+	} else {
+		log.Println(err)
+	}
+	return r
+}
+
 func ApiMetrics(hostName string, metrics core.MetricList) (*AllMetrics, error) {
-	filter := strings.Join(metrics, "%20")
+	filter := strings.Join(metrics, " ")
 	query := url.Values{}
 	query.Add("format", "json")
 	query.Add("filter", filter)

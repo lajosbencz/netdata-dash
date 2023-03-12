@@ -3,8 +3,9 @@ package agent
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
+
+	"github.com/lajosbencz/netdata-dash/utils"
 )
 
 type Address struct {
@@ -17,17 +18,19 @@ func (r Address) Format() string {
 }
 
 type Config struct {
-	HostName string  `json:"hostname,omitempty"`
-	Realm    string  `json:"realm,omitempty"`
-	Router   Address `json:"router,omitempty"`
-	Netdata  Address `json:"netdata,omitempty"`
+	HostName string              `json:"hostname,omitempty"`
+	HostTags utils.StringsUnique `json:"host_tags,omitempty"`
+	Realm    string              `json:"realm,omitempty"`
+	Dash     Address             `json:"dash,omitempty"`
+	Netdata  Address             `json:"netdata,omitempty"`
 }
 
 func DefaultConfig() *Config {
 	return &Config{
 		HostName: "localhost",
+		HostTags: utils.StringsUnique{},
 		Realm:    "netdata",
-		Router: Address{
+		Dash: Address{
 			Host: "localhost",
 			Port: 16666,
 		},
@@ -42,10 +45,10 @@ func (r *Config) FromFile(jsonPath string) error {
 	if _, err := os.Stat(jsonPath); err == nil {
 		fh, err := os.Open(jsonPath)
 		if err != nil {
-			log.Fatalln(err)
+			return err
 		}
 		if err := json.NewDecoder(fh).Decode(r); err != nil {
-			log.Fatalln(err)
+			return err
 		}
 	}
 	return nil

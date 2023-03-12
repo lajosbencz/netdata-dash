@@ -9,13 +9,13 @@ import (
 	"github.com/gammazero/nexus/v3/wamp"
 )
 
-type ChartDataPoint []interface{}
+type ChartDataPoints []interface{}
 
-func (r ChartDataPoint) GetTime() int {
+func (r ChartDataPoints) GetTime() int {
 	return r[0].(int)
 }
 
-func (r ChartDataPoint) GetValues() []float64 {
+func (r ChartDataPoints) GetValues() []float64 {
 	l := []float64{}
 	for _, v := range r[1:] {
 		l = append(l, v.(float64))
@@ -24,22 +24,22 @@ func (r ChartDataPoint) GetValues() []float64 {
 }
 
 type ChartData struct {
-	Labels []string         `json:"labels"`
-	Data   []ChartDataPoint `json:"data"`
+	Labels []string          `json:"labels"`
+	Data   []ChartDataPoints `json:"data"`
 }
 
 func (r *ChartData) GetTime(index int) int {
 	return r.Data[index][0].(int)
 }
 
-func ChartDataFromDict(d wamp.Dict) ChartData {
+func ChartDataFromWampDict(d wamp.Dict) ChartData {
 	labels := []string{}
 	if labelList, ok := wamp.AsList(d["labels"]); ok {
 		for _, v := range labelList {
 			labels = append(labels, v.(string))
 		}
 	}
-	data := []ChartDataPoint{}
+	data := []ChartDataPoints{}
 	if dataList0, ok := wamp.AsList(d["data"]); ok {
 		for _, v0 := range dataList0 {
 			if dataList1, ok := wamp.AsList(v0); ok {

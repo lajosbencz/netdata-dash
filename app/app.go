@@ -11,12 +11,15 @@ import (
 
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/wamp"
+	"github.com/lajosbencz/netdata-dash/agent"
 	"github.com/lajosbencz/netdata-dash/core"
 	"github.com/lajosbencz/netdata-dash/netdata"
+	"github.com/lajosbencz/netdata-dash/utils"
 )
 
 type App struct {
 	wampClient    *client.Client
+	agents        map[wamp.ID]string
 	registrations core.ClientHostMetrics
 	topics        topicHostMetric
 }
@@ -24,13 +27,46 @@ type App struct {
 func NewApp(wampClient *client.Client) *App {
 	return &App{
 		wampClient:    wampClient,
+		agents:        map[wamp.ID]string{},
 		registrations: core.ClientHostMetrics{},
 		topics:        topicHostMetric{},
 	}
 }
 
+func (r App) Agents() map[wamp.ID]string {
+	return r.agents
+}
+
+func (r App) AgentHosts() []string {
+	strList := utils.StringsUnique{}
+	for _, v := range r.agents {
+		if str, ok := wamp.AsString(v); ok {
+			strList.Add(str)
+		}
+	}
+	return strList
+}
+
 func (r *App) Close() error {
 	return r.wampClient.Close()
+}
+
+func (r *App) onSessionJoin(event *wamp.Event) {
+	if len(event.Arguments) != 0 {
+		if details, ok := wamp.AsDict(event.Arguments[0]); ok {
+			log.Printf("onSessionJoin %#v\n", details)
+			sessionID, _ := wamp.AsID(details["session"])
+			if hostName, ok := wamp.AsString(details[agent.HostnameKey]); ok {
+				r.agents[sessionID] = hostName
+				r.wampClient.Publish("host.join", wamp.Dict{}, wamp.List{}, wamp.Dict{
+					agent.HostnameKey: hostName,
+				})
+				if wampList, ok := wamp.AsList(r.AgentHosts()); ok {
+					r.wampClient.Publish("host.list", wamp.Dict{}, wampList, nil)
+				}
+			}
+		}
+	}
 }
 
 func (r *App) onSubscribe(event *wamp.Event) {
@@ -68,24 +104,34 @@ func (r *App) onUnsubscribe(event *wamp.Event) {
 func (r *App) onSessionLeave(event *wamp.Event) {
 	log.Printf("onSessionLeave %#v\n", event)
 	if len(event.Arguments) != 0 {
-		if details, ok := wamp.AsDict(event.Arguments[0]); ok {
-			sessionID, _ := wamp.AsID(details["session"])
-			authID, _ := wamp.AsString(details["authid"])
-			log.Printf("Client %v left the session (authid=%s)\n", sessionID, authID)
+		if sessionID, ok := wamp.AsID(event.Arguments[0]); ok {
+			if hostName, in := r.agents[sessionID]; in {
+				delete(r.agents, sessionID)
+				r.wampClient.Publish("host.leave", wamp.Dict{}, wamp.List{}, wamp.Dict{
+					agent.HostnameKey: hostName,
+				})
+				if wampList, ok := wamp.AsList(r.AgentHosts()); ok {
+					r.wampClient.Publish("host.list", wamp.Dict{}, wampList, nil)
+				}
+			}
 		}
 	}
 }
 
-func (r *App) RunLoop() {
-	if err := r.wampClient.Subscribe(string(wamp.MetaEventSubOnSubscribe), (*r).onSubscribe, nil); err != nil {
-		log.Fatalln(err)
+func (r *App) RunLoop() error {
+	if err := r.wampClient.Subscribe(string(wamp.MetaEventSessionOnJoin), r.onSessionJoin, nil); err != nil {
+		return err
 	}
-	if err := r.wampClient.Subscribe(string(wamp.MetaEventSubOnUnsubscribe), (*r).onUnsubscribe, nil); err != nil {
-		log.Fatalln(err)
+	if err := r.wampClient.Subscribe(string(wamp.MetaEventSubOnSubscribe), r.onSubscribe, nil); err != nil {
+		return err
 	}
-	if err := r.wampClient.Subscribe(string(wamp.MetaEventSessionOnLeave), (*r).onSessionLeave, nil); err != nil {
-		log.Fatalln(err)
+	if err := r.wampClient.Subscribe(string(wamp.MetaEventSubOnUnsubscribe), r.onUnsubscribe, nil); err != nil {
+		return err
 	}
+	if err := r.wampClient.Subscribe(string(wamp.MetaEventSessionOnLeave), r.onSessionLeave, nil); err != nil {
+		return err
+	}
+	r.wampClient.Register("host.list", r.RpcHosts, wamp.Dict{"disclose_caller": true})
 	r.wampClient.Register("chart.data", r.RpcChartData, wamp.Dict{"disclose_caller": true})
 	r.wampClient.Register("chart.topic", func(ctx context.Context, i *wamp.Invocation) client.InvokeResult {
 		host, _ := wamp.AsString(i.ArgumentsKw["host"])
@@ -121,6 +167,19 @@ out:
 		case <-shutdown:
 			break out
 		}
+	}
+	return nil
+}
+
+func (r *App) RpcHosts(ctx context.Context, i *wamp.Invocation) client.InvokeResult {
+	list := utils.StringsUnique{}
+	for _, v := range r.agents {
+		list.Add(v)
+	}
+	return client.InvokeResult{
+		Kwargs: wamp.Dict{
+			"list": list,
+		},
 	}
 }
 

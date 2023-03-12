@@ -38,7 +38,7 @@ func main() {
 			log.Printf("%#v\n", event.Arguments[0])
 		}
 		if kwData, ok := wamp.AsDict(event.ArgumentsKw["data"]); ok {
-			data := netdata.ChartDataFromDict(kwData)
+			data := netdata.ChartDataFromWampDict(kwData)
 			log.Printf("%#v\n", data.Labels)
 		}
 	}

@@ -1,6 +1,17 @@
 package utils
 
+import "strings"
+
 type StringsUnique []string
+
+func (r *StringsUnique) String() string {
+	return strings.Join(*r, ",")
+}
+
+func (r *StringsUnique) Set(value string) error {
+	*r = strings.Split(value, ",")
+	return nil
+}
 
 func (r *StringsUnique) Has(str string) bool {
 	for _, v := range *r {

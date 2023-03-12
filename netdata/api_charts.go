@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+
+	"github.com/gammazero/nexus/v3/wamp"
 )
 
 type Host struct {
@@ -38,7 +40,7 @@ type Chart struct {
 	Functions      map[string]interface{} `json:"functions"`
 }
 
-type ApiDataCharts struct {
+type HostData struct {
 	Hostname        string           `json:"hostname"`
 	Version         string           `json:"version"`
 	ReleaseChannel  string           `json:"release_channel"`
@@ -57,7 +59,7 @@ type ApiDataCharts struct {
 	Hosts           []Host           `json:"hosts"`
 }
 
-func ApiCharts(hostName string) (*ApiDataCharts, error) {
+func ApiCharts(hostName string) (*HostData, error) {
 	query := url.Values{}
 	query.Add("format", "json")
 	url := fmt.Sprintf("http://%s/api/v1%s?%s", hostName, apiPathCharts, query.Encode())
@@ -66,11 +68,35 @@ func ApiCharts(hostName string) (*ApiDataCharts, error) {
 		return nil, err
 	}
 	defer res.Body.Close()
-	d := &ApiDataCharts{}
+	d := &HostData{}
 	if err := json.NewDecoder(res.Body).Decode(&d); err != nil {
 		return nil, err
 	}
-	log.Println(url)
-	log.Printf("%#v\n", *d)
+	// log.Println(url)
+	// log.Printf("%#v\n", *d)
 	return d, nil
+}
+
+func ChartFromWampDict(dict wamp.Dict) Chart {
+	r := Chart{}
+	if d, err := json.Marshal(dict); err == nil {
+		if err = json.Unmarshal(d, &r); err != nil {
+			log.Println(err)
+		}
+	} else {
+		log.Println(err)
+	}
+	return r
+}
+
+func HostDataFromWampDict(dict wamp.Dict) HostData {
+	r := HostData{}
+	if d, err := json.Marshal(dict); err == nil {
+		if err = json.Unmarshal(d, &r); err != nil {
+			log.Println(err)
+		}
+	} else {
+		log.Println(err)
+	}
+	return r
 }
