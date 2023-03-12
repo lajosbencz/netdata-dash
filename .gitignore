@@ -1,3 +1,6 @@
 .idea/
 
 /dist/
+netdata-dash
+netdata-dash-agent
+netdata-dash-client
