@@ -31,7 +31,7 @@ jobs:
           go-version: "1.19"
 
       - name: Dependencies
-        run: go get .
+        run: go get -v ./...
 
       - name: Build
         run: make ./dist/${{ matrix.cmd }}
