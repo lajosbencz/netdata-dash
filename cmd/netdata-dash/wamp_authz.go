@@ -21,7 +21,7 @@ func isProtectedTopic(name string) bool {
 func (a *authz) Authorize(sess *wamp.Session, msg wamp.Message) (bool, error) {
 	role := wamp.OptionString(sess.Details, "authrole")
 	// if the role is root, allow everything
-	if role == a.rootRole {
+	if role == a.rootRole && a.rootRole != "" {
 		return true, nil
 	}
 	// for every other role, be restrictive
