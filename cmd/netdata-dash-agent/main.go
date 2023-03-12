@@ -15,17 +15,22 @@ import (
 )
 
 const (
-	defaultConfigPath = "config.json"
+	defaultConfigPath = "agent.json"
 )
 
 func main() {
+	var (
+		authUser, authPassword string
+	)
 	verboseOutput := false
 	configPath := defaultConfigPath
 	agentConfig := agent.DefaultConfig()
 	if osHostname, err := os.Hostname(); err == nil {
 		agentConfig.HostName = osHostname
 	}
-	flag.StringVar(&configPath, "config", configPath, "Path of config.json")
+	flag.StringVar(&authUser, "u", "", "Auth user")
+	flag.StringVar(&authPassword, "p", "", "Auth password")
+	flag.StringVar(&configPath, "config", configPath, "Path of config file")
 	flag.StringVar(&agentConfig.HostName, "hostname", agentConfig.HostName, "Overwrite registration hostname (useful for debugging)")
 	flag.Var(&agentConfig.HostTags, "tags", "Comma separated list of host_tags")
 	flag.StringVar(&agentConfig.Realm, "realm", agentConfig.Realm, "Realm")
@@ -35,6 +40,10 @@ func main() {
 	flag.IntVar(&agentConfig.Netdata.Port, "netdata-port", agentConfig.Netdata.Port, "Netdata port")
 	flag.BoolVar(&verboseOutput, "vv", verboseOutput, "Verbose output")
 	flag.Parse()
+
+	if authUser == "" || authPassword == "" {
+		log.Fatalln("no auth credentials provided (-u -)")
+	}
 
 	if err := agentConfig.FromFile(configPath); err != nil && (!os.IsNotExist(err) || configPath != defaultConfigPath) {
 		log.Fatalln(err)
@@ -47,7 +56,13 @@ func main() {
 		Logger:        log.Default(),
 		Serialization: client.MSGPACK,
 		HelloDetails: wamp.Dict{
+			"authid":          authUser,
 			agent.HostnameKey: agentConfig.HostName,
+		},
+		AuthHandlers: map[string]client.AuthFunc{
+			"ticket": func(challenge *wamp.Challenge) (signature string, details wamp.Dict) {
+				return authPassword, wamp.Dict{}
+			},
 		},
 	}
 	wampClient, err := app.NewTlsClient(context.Background(), wampUrl, wampConfig)

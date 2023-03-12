@@ -1,9 +1,8 @@
 package agent
 
 import (
-	"log"
-
 	"github.com/gammazero/nexus/v3/client"
+	"github.com/gammazero/nexus/v3/stdlog"
 	"github.com/gammazero/nexus/v3/wamp"
 
 	"github.com/lajosbencz/netdata-dash/pkg/netdata"
@@ -21,10 +20,10 @@ type Agent struct {
 	chartsData  netdata.HostData
 	wampClient  *client.Client
 	topicIds    map[wamp.ID]string
-	logger      *log.Logger
+	logger      stdlog.StdLog
 }
 
-func NewAgent(hostName string, config *Config, wampClient *client.Client, logger *log.Logger) (*Agent, error) {
+func NewAgent(hostName string, config *Config, wampClient *client.Client, logger stdlog.StdLog) (*Agent, error) {
 	if config == nil {
 		config = DefaultConfig()
 	}

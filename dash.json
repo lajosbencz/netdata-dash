@@ -1,0 +1,5 @@
+{
+	"users": [
+		{"name": "foobar", "role": "agent", "secret": "verysecretivesecret"}
+	]
+}

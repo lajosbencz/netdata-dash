@@ -14,10 +14,14 @@ import (
 	"github.com/lajosbencz/netdata-dash/pkg/app"
 )
 
+const (
+	DefaultConfigPath = "dash.json"
+)
+
 func main() {
 	var (
 		realm     = "netdata"
-		host      = "0.0.0.0"
+		host      = "127.0.0.1"
 		port      = 16666
 		agentName = ""
 	)

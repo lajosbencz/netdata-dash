@@ -9,11 +9,16 @@ import (
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/router"
 	"github.com/gammazero/nexus/v3/router/auth"
+	"github.com/gammazero/nexus/v3/stdlog"
 	"github.com/gammazero/nexus/v3/wamp"
 )
 
-func newWamp(realm string, logger *log.Logger) (router.Router, *client.Client, *router.WebsocketServer, error) {
-	crAuth := auth.NewCRAuthenticator(&serverKeyStore{provider: "static"}, time.Second*5)
+func newWamp(realm string, logger stdlog.StdLog) (router.Router, *client.Client, *router.WebsocketServer, error) {
+	ks, err := WatchFileKeyStore(DefaultConfigPath, logger)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	crAuth := auth.NewTicketAuthenticator(ks, time.Second*5)
 	routerConfig := &router.Config{
 		Debug: false,
 		RealmConfigs: []*router.RealmConfig{
@@ -22,6 +27,7 @@ func newWamp(realm string, logger *log.Logger) (router.Router, *client.Client, *
 				AnonymousAuth:  true,
 				AllowDisclose:  true,
 				Authenticators: []auth.Authenticator{crAuth},
+				Authorizer:     &authz{"agent"},
 			},
 		},
 	}
