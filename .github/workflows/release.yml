@@ -3,6 +3,12 @@
 name: Go
 
 on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+
   release:
     types: [created]
 
@@ -44,12 +50,23 @@ jobs:
 
       - name: Build
         run: make ./dist/${{ matrix.cmd }}
-      
+
       - name: Archive
         run: tar -cvzf ${{ matrix.cmd }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz dist/${{ matrix.cmd }} README.md LICENSE
-        
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
       - name: Upload Release Asset
-        id: upload-release-asset 
+        id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -58,4 +75,3 @@ jobs:
           asset_path: ./${{ matrix.cmd }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
           asset_name: ${{ matrix.cmd }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
           asset_content_type: application/gzip
-
