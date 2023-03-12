@@ -30,6 +30,9 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
+          overwrite: true
+          pre_command: export CGO_ENABLED=0 && export GODEBUG=http2client=0
+          ldflags: -s -w
           project_path: ./cmd/${{ matrix.cmd }}
           binary_name: ${{ matrix.cmd }}
           extra_files: LICENSE README.md
