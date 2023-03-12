@@ -52,7 +52,7 @@ const requireStyle = (src, integrity) => {
 
 const NETDATA_DEFAULTS = {
     autoStart: true,
-    WAMP_ADDRESS: "ws://localhost:9301",
+    WAMP_ADDRESS: "wss://localhost:16666/ws/",
     WAMP_REALM: "netdata",
     FORMAT_DATETIME: (dt) => {
         return (new Date(dt)).toISOString().substring(0, 19)

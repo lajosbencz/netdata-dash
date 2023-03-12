@@ -38,7 +38,7 @@ const mergeDeep = (target, ...sources) => {
 
 class Chart {
     static DefaultOptions = {
-        broker: 'ws://localhost:9301/ws/',
+        broker: 'wss://localhost:16666/ws/',
         realm: 'netdata',
         theme: 'dark',
         type: 'sparkline',

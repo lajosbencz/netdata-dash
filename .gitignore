@@ -1,6 +1,6 @@
 .idea/
 
 /dist/
-netdata-dash
-netdata-dash-agent
-netdata-dash-client
+/cmd/netdata-dash/netdata-dash
+/cmd/netdata-dash-agent/netdata-dash-agent
+/cmd/netdata-dash-client/netdata-dash-client

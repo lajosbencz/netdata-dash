@@ -11,6 +11,7 @@ import (
 	"github.com/gammazero/nexus/v3/wamp"
 
 	"github.com/lajosbencz/netdata-dash/pkg/agent"
+	"github.com/lajosbencz/netdata-dash/pkg/app"
 )
 
 const (
@@ -39,7 +40,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	wampUrl := fmt.Sprintf("http://%s/ws/", agentConfig.Dash.Format())
+	wampUrl := fmt.Sprintf("https://%s/ws/", agentConfig.Dash.Format())
 	wampConfig := client.Config{
 		Realm:         agentConfig.Realm,
 		Debug:         verboseOutput,
@@ -49,7 +50,7 @@ func main() {
 			agent.HostnameKey: agentConfig.HostName,
 		},
 	}
-	wampClient, err := client.ConnectNet(context.Background(), wampUrl, wampConfig)
+	wampClient, err := app.NewTlsClient(context.Background(), wampUrl, wampConfig)
 	if err != nil {
 		log.Fatalln(err)
 	}

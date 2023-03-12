@@ -10,6 +10,7 @@ import (
 
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/wamp"
+	"github.com/lajosbencz/netdata-dash/pkg/app"
 	"github.com/lajosbencz/netdata-dash/pkg/core"
 	"github.com/lajosbencz/netdata-dash/pkg/netdata"
 	"github.com/lajosbencz/netdata-dash/pkg/utils"
@@ -67,8 +68,8 @@ func main() {
 	wampConfig := client.Config{
 		Realm: realm,
 	}
-	wampUrl := fmt.Sprintf("http://%s:%d/ws/", host, port)
-	wampClient, err := client.ConnectNet(ctx, wampUrl, wampConfig)
+	wampUrl := fmt.Sprintf("https://%s:%d/ws/", host, port)
+	wampClient, err := app.NewTlsClient(ctx, wampUrl, wampConfig)
 	if err != nil {
 		log.Fatalln(err)
 	}

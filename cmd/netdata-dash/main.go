@@ -46,9 +46,13 @@ func main() {
 
 	failed := make(chan error, 1)
 
-	httpServer := &http.Server{Addr: listenAddress, Handler: httpRouter}
+	httpsListener, err := newTlsListener(listenAddress, "localhost", "dev", "dev", "dev", 3600)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	httpsServer := &http.Server{Addr: listenAddress, Handler: httpRouter}
 	go func() {
-		if err := httpServer.ListenAndServe(); err != nil {
+		if err := httpsServer.Serve(httpsListener); err != nil {
 			failed <- err
 		}
 	}()
@@ -60,7 +64,7 @@ func main() {
 		}
 	}()
 
-	log.Printf("listening on http://%s\n", listenAddress)
+	log.Printf("listening on https://%s\n", listenAddress)
 
 	runCount := 2
 out:
@@ -79,6 +83,6 @@ out:
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	httpServer.Shutdown(ctx)
+	httpsServer.Shutdown(ctx)
 	cancel()
 }
