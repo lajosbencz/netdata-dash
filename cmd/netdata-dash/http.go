@@ -2,7 +2,12 @@ package main
 
 import (
 	"embed"
+	"io"
+	"log"
 	"net/http"
+	"strings"
+
+	"github.com/flosch/pongo2/v6"
 )
 
 //go:embed public
@@ -36,8 +41,20 @@ func serveStaticFile(fs http.FileSystem, path string, w http.ResponseWriter, r *
 		fi, err := f.Stat()
 		if err == nil {
 			if !fi.IsDir() {
-				http.ServeContent(w, r, fi.Name(), fi.ModTime(), f)
-				return true
+				if strings.HasSuffix(fi.Name(), ".html") {
+					content, err := io.ReadAll(f)
+					if err != nil {
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return true
+					}
+					tpl := pongo2.Must(pongo2.FromBytes(content))
+					if err := tpl.ExecuteWriter(pongo2.Context{}, w); err != nil {
+						log.Println(err)
+					}
+					return true
+				} else {
+					http.ServeContent(w, r, fi.Name(), fi.ModTime(), f)
+				}
 			}
 		}
 	}

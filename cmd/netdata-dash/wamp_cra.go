@@ -87,7 +87,6 @@ func (ks *watchFileKeyStore) UpdateFromFile() error {
 		}
 	}
 	ks.fileKeyStore.Users = newUsers
-	ks.logger.Printf("config updated from %s to %#v\n", ks.filePath, ks.fileKeyStore)
 	return nil
 }
 

@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 
 <head>
-    <title>Netdata WAMP TV</title>
+    <title>Netdata AIC {{ '@ django!' }}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -26,6 +26,7 @@
             justify-content: space-between;
         }
     </style>
+    <script src="/chart.js"></script>
     <script src="/index.js"></script>
 </head>
 
@@ -37,8 +38,8 @@
             <div>bar</div>
         </div>
         <div class="grid">
-            <div x-netdata data-chart="system.cpu" data-host="localhost:19999" style="width:100%;"></div>
-            <div x-netdata data-chart="system.ram" data-host="localhost:19999" style="width:100%;"></div>
+            <div x-netdata data-metric="system.cpu" data-host="test001" style="width:100%; min-height: 280px"></div>
+            <div x-netdata data-metric="system.ram" data-host="test001" style="width:100%; min-height: 280px"></div>
         </div>
     </div>
     <div class="netdata-controls">

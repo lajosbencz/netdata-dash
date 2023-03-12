@@ -1,5 +1,0 @@
-{
-    "users": [
-        {"name": "agent", "role": "agent", "secret": "somerandomsecrettoauthwith"}
-    ]
-}

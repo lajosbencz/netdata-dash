@@ -1,3 +1,32 @@
+/**
+ * Simple object check.
+ * @param item
+ * @returns {boolean}
+ */
+const isObject = (item) => {
+    return (item && typeof item === 'object' && !Array.isArray(item));
+}
+
+/**
+ * Deep merge two objects.
+ * @param target
+ * @param ...sources
+ */
+const mergeDeep = (target, ...sources) => {
+    if (!sources.length) return target;
+    const source = sources.shift();
+    if (isObject(target) && isObject(source)) {
+        for (const key in source) {
+            if (isObject(source[key])) {
+                if (!target[key]) Object.assign(target, { [key]: {} });
+                mergeDeep(target[key], source[key]);
+            } else {
+                Object.assign(target, { [key]: source[key] });
+            }
+        }
+    }
+    return mergeDeep(target, ...sources);
+}
 
 String.prototype.hashCode = function () {
     var hash = 0,
@@ -138,37 +167,39 @@ NETDATA.start = async function () {
             },
         }))
 
-        const createChart = async el => {
+        const createChart = async (wamp, el) => {
+            const chart = Chart.Create(el)
+            const topic = 'chart.data._.' + chart.host + '._.' + chart.metric
+            const params = { metric: chart.metric, after: chart.options.after }
+            const {kwargs: chartData} = await wamp.call('chart.data._.' + chart.host, [], params)
+            chart.initData(chartData)
+            const sub = await wamp.subscribe(topic, (args, { metricName, metricData: { last_updated, dimensions } }) => {
+                const labels = []
+                const data = []
+                if (chart.data[0].hasOwnProperty('name')) {
+                    labels.push('time')
+                    data.push(last_updated)
+                    Object.values(chart.data).forEach(e => {
+                        labels.push(e.name)
+                        data.push(dimensions[e.name].value)
+                    })
+                } else {
+                    chart.data[0].forEach(t => {
+                        labels.push(t)
+                        if (t === 'time') {
+                            data.push(last_updated)
+                        } else {
+                            data.push(dimensions[t].value)
+                        }
+                    })
+                }
+                chart.appendData({ labels, data: [data] })
+            })
+            chart.ondispose(() => {
+                console.log('disposing', sub)
+                wamp.unsubscribe(sub)
+            })
         }
-
-        // const createChartDygraph = async el => {
-        //     const wamp = await deferWampSession
-        //     const host = el.dataset.host || 'localhost:19999'
-        //     const chart = el.dataset.chart || 'system.cpu'
-        //     const chartType = el.dataset.type || 'line'
-        //     const height = parseInt(el.dataset.height || 350)
-        //     const { kwargs: { data: { labels, data } } } = await wamp.call('data', [], {
-        //         host,
-        //         chart,
-        //         before: 0,
-        //         after: -60,
-        //     })
-        //     console.log({ labels, data })
-
-        //     const graph = new Dygraph(el, data.reverse(), {
-        //         showRoller: true,
-        //         gridLineColor: 'rgba(255,255,255,.05)',
-        //         labels,
-        //     })
-
-        //     return {
-        //         graph,
-        //         host,
-        //         chart,
-        //         labels,
-        //         data,
-        //     }
-        // }
 
         // x-netdata
         //Alpine.directive('netdata', (el, { value, modifiers, expression }, { Alpine, evaluate, effect, cleanup }) => {
@@ -176,13 +207,17 @@ NETDATA.start = async function () {
         Alpine.directive('netdata', async (el, a, b) => {
             // console.log('x-netdata', a, b)
             const wamp = await deferWampSession
-            let { graph, labels, data: oldData, host, chart } = await createChart(el)
-            const sub = await wamp.subscribe('data.' + chart, (args, { data: newData }) => {
-                oldData = [...(oldData.slice(1)), newData]
-                console.log(oldData)
-                graph.updateOptions({ 'file': oldData })
-            })
-            console.log({ sub, graph, oldData, host, chart })
+            try {
+                let { graph, labels, data: oldData, host, chart } = await createChart(wamp, el)
+                const sub = await wamp.subscribe('data.' + chart, (args, { data: newData }) => {
+                    oldData = [...(oldData.slice(1)), newData]
+                    console.log(oldData)
+                    graph.updateOptions({ 'file': oldData })
+                })
+                console.log({ sub, graph, oldData, host, chart })
+            } catch (e) {
+                console.error(e)
+            }
         })
 
     })

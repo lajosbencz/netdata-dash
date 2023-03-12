@@ -22,3 +22,7 @@ func TopicChartData(hostName, metricName string) string {
 func TopicHostHeartbeat(hostName string) string {
 	return TopicHostHeartbeatPrefix + TopicPartDelimiter + hostName
 }
+
+func ProcedureChartData(hostName string) string {
+	return TopicChartDataPrefix + TopicPartDelimiter + hostName
+}

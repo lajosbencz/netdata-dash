@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -20,15 +21,13 @@ const (
 
 func main() {
 	var (
-		realm     = "netdata"
-		host      = "127.0.0.1"
-		port      = 16666
-		agentName = ""
+		realm = "netdata"
+		host  = "0.0.0.0"
+		port  = 16666
 	)
 	flag.StringVar(&realm, "realm", realm, "realm")
 	flag.StringVar(&host, "host", host, "network host")
 	flag.IntVar(&port, "port", port, "network port")
-	flag.StringVar(&agentName, "agent", agentName, "run local agent with provided hostname")
 	flag.Parse()
 
 	wampRouter, wampClient, wampServer, err := newWamp(realm, log.Default())
@@ -68,7 +67,11 @@ func main() {
 		}
 	}()
 
-	log.Printf("listening on https://%s\n", listenAddress)
+	la := listenAddress
+	if strings.HasPrefix(la, "0.0.0.0:") {
+		la = "localhost:" + strings.TrimPrefix(la, "0.0.0.0:")
+	}
+	log.Printf("listening on https://%s\n", la)
 
 	runCount := 2
 out:

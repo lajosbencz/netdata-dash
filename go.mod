@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	github.com/flosch/pongo2/v6 v6.0.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/crypto v0.7.0 // indirect

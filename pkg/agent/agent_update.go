@@ -11,7 +11,7 @@ import (
 )
 
 func (r *Agent) UpdateCharts() error {
-	charts, err := netdata.ApiCharts(r.Config.NetdataAddress())
+	charts, err := netdata.ApiCharts(r.Config.Netdata.Format())
 	if err != nil {
 		return err
 	}
