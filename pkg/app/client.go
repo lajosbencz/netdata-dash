@@ -13,7 +13,7 @@ func NewTlsClient(ctx context.Context, addr string, cfg client.Config) (*client.
 		cfg.TlsCfg = &tls.Config{}
 	}
 	cfg.TlsCfg.InsecureSkipVerify = true
-	c, err := client.ConnectNet(context.Background(), addr, cfg)
+	c, err := client.ConnectNet(ctx, addr, cfg)
 	if err != nil {
 		return nil, err
 	}
