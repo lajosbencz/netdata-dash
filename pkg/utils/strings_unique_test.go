@@ -3,7 +3,7 @@ package utils_test
 import (
 	"testing"
 
-	"github.com/lajosbencz/netdata-dash/utils"
+	"github.com/lajosbencz/netdata-dash/pkg/utils"
 )
 
 func TestStringsUnique(t *testing.T) {

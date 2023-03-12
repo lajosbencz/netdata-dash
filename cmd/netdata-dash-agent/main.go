@@ -10,7 +10,7 @@ import (
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/wamp"
 
-	"github.com/lajosbencz/netdata-dash/agent"
+	"github.com/lajosbencz/netdata-dash/pkg/agent"
 )
 
 const (

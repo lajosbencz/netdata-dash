@@ -2,7 +2,7 @@ package core
 
 import (
 	"github.com/gammazero/nexus/v3/wamp"
-	"github.com/lajosbencz/netdata-dash/utils"
+	"github.com/lajosbencz/netdata-dash/pkg/utils"
 )
 
 type MetricList = utils.StringsUnique

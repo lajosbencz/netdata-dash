@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/lajosbencz/netdata-dash/utils"
+	"github.com/lajosbencz/netdata-dash/pkg/utils"
 )
 
 type Address struct {

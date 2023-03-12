@@ -3,7 +3,7 @@ package core_test
 import (
 	"testing"
 
-	"github.com/lajosbencz/netdata-dash/core"
+	"github.com/lajosbencz/netdata-dash/pkg/core"
 )
 
 func TestConstants(t *testing.T) {

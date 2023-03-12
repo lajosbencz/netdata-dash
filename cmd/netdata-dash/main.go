@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/lajosbencz/netdata-dash/app"
+	"github.com/lajosbencz/netdata-dash/pkg/app"
 )
 
 func main() {

@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/gammazero/nexus/v3/wamp"
-	"github.com/lajosbencz/netdata-dash/core"
+	"github.com/lajosbencz/netdata-dash/pkg/core"
 )
 
 type Metric struct {

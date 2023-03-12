@@ -7,9 +7,9 @@ import (
 
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/wamp"
-	"github.com/lajosbencz/netdata-dash/agent"
-	"github.com/lajosbencz/netdata-dash/core"
-	"github.com/lajosbencz/netdata-dash/utils"
+	"github.com/lajosbencz/netdata-dash/pkg/agent"
+	"github.com/lajosbencz/netdata-dash/pkg/core"
+	"github.com/lajosbencz/netdata-dash/pkg/utils"
 )
 
 type App struct {

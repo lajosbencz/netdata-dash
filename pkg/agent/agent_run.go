@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/gammazero/nexus/v3/wamp"
-	"github.com/lajosbencz/netdata-dash/core"
-	"github.com/lajosbencz/netdata-dash/netdata"
+	"github.com/lajosbencz/netdata-dash/pkg/core"
+	"github.com/lajosbencz/netdata-dash/pkg/netdata"
 )
 
 func (r *Agent) Run() error {

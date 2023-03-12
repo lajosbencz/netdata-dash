@@ -2,7 +2,7 @@
 
 # LDFLAGS := "-w -s"
 LDFLAGS := ""
-SRCDIR := ./make
+SRCDIR := ./cmd
 DISTDIR := ./dist
 SOURCES := $(wildcard $(SRCDIR)/*)
 OBJECTS := $(SOURCES:$(SRCDIR)/%=$(DISTDIR)/%)
