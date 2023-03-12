@@ -1,45 +1,6 @@
-const defer = () => {
-    const bag = {}
-    return Object.assign(
-        new Promise((resolve, reject) => Object.assign(bag, { resolve, reject })),
-        bag
-    )
-}
-
-/**
- * Simple object check.
- * @param item
- * @returns {boolean}
- */
-const isObject = (item) => {
-    return (item && typeof item === 'object' && !Array.isArray(item));
-}
-
-/**
- * Deep merge two objects.
- * @param target
- * @param ...sources
- */
-const mergeDeep = (target, ...sources) => {
-    if (!sources.length) return target;
-    const source = sources.shift();
-    if (isObject(target) && isObject(source)) {
-        for (const key in source) {
-            if (isObject(source[key])) {
-                if (!target[key]) Object.assign(target, { [key]: {} });
-                mergeDeep(target[key], source[key]);
-            } else {
-                Object.assign(target, { [key]: source[key] });
-            }
-        }
-    }
-    return mergeDeep(target, ...sources);
-}
 
 class Chart {
     static DefaultOptions = {
-        broker: 'wss://localhost:16666/ws/',
-        realm: 'netdata',
         theme: 'dark',
         type: 'sparkline',
         host: 'localhost',
@@ -91,7 +52,7 @@ class Chart {
 
     static AllCharts = []
     static Create(el) {
-        const metric = el.dataset.netdata
+        const metric = el.dataset.metric
         const options = {}
         const optBool = (v) => {
             if (v === 'true' || v === '1') {
@@ -178,7 +139,7 @@ class Chart {
         this.metric = metric
         this.options = mergeDeep({}, Chart.DefaultOptions, options)
         this.type = this.options.type
-        this.host = this.options.host + ":" + this.options.port
+        this.host = this.options.host
         this.group = this.options.group
         this.data = []
         this.chart = echarts.init(this.el, this.options.theme, { renderer: 'canvas' })
@@ -458,61 +419,3 @@ class PieChart extends ValueChart {
         })
     }
 }
-
-const genTestData = (n) => {
-    const t = Math.floor(+new Date() / 1000)
-    const d = []
-    for (let i = 0; i < n; i++) {
-        const a = Math.random() * 40
-        const b = Math.random() * 40
-        const c = 100 - a - b
-        d.push([t - i, a, b, c])
-    }
-    return d
-}
-
-const createChart = (ab) => async (el) => {
-    const chart = Chart.Create(el)
-    const params = { host: chart.host, metric: chart.metric }
-    const { kwargs: { data: chartData } } = await ab.call('chart.data', [], { ...params, after: chart.options.after })
-    chart.initData(chartData)
-    const { kwargs: { topic } } = await ab.call('chart.topic', [], params)
-    const sub = await ab.subscribe(topic, (args, { data: { last_updated, dimensions } }) => {
-        const labels = []
-        const data = []
-        if (chart.data[0].hasOwnProperty('name')) {
-            labels.push('time')
-            data.push(last_updated)
-            Object.values(chart.data).forEach(e => {
-                labels.push(e.name)
-                data.push(dimensions[e.name].value)
-            })
-        } else {
-            chart.data[0].forEach(t => {
-                labels.push(t)
-                if (t === 'time') {
-                    data.push(last_updated)
-                } else {
-                    data.push(dimensions[t].value)
-                }
-            })
-        }
-        chart.appendData({ labels, data: [data] })
-    })
-    chart.ondispose(() => {
-        console.log('disposing', sub)
-        ab.unsubscribe(sub)
-    })
-}
-
-window.addEventListener('load', async () => {
-    const deferSession = defer()
-    const abConnection = new autobahn.Connection({ url: Chart.DefaultOptions.broker, realm: Chart.DefaultOptions.realm })
-    abConnection.onopen = session => {
-        deferSession.resolve(session)
-    }
-    abConnection.open()
-    const abSession = await deferSession
-    document.querySelectorAll('body [data-netdata]').forEach(createChart(abSession))
-
-})

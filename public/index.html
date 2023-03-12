@@ -3,21 +3,42 @@
 
 <head>
     <title>Netdata AIC {{ '@ django!' }}</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/picocss/1.5.7/pico.min.css"
+        integrity="sha512-1VnpjjanhjGWRcbZCUKqh1KbNIGAd8aqsokcHUNlBFM3CfAUasd7D0h1luMzyS01W74K4zUZq7GZnj3yoGYEFQ=="
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
+        integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
+        crossorigin="anonymous">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/autobahn/22.10.1/autobahn.min.js"
+        integrity="sha512-NV3SvHAZNmkfgYNYbooVfXPHOXSxozk0TJALPt9J2xk1cVwp0YnTw5k3W6IClirda/A9DspvjeBqxmgPvdus+w=="
+        crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/echarts/5.4.1/echarts.min.js"
+        integrity="sha512-OTbGFYPLe3jhy4bUwbB8nls0TFgz10kn0TLkmyA+l3FyivDs31zsXCjOis7YGDtE2Jsy0+fzW+3/OVoPVujPmQ=="
+        crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/alpinejs/3.12.0/cdn.js" defer
+        integrity="sha512-6pVa1JFPLsAVloI/eZXmbDkCWYVB3Y8ODVA2gVUIowY2laRHAYaYPE1f4KjSvPwNimMmGo4MvteDc3JZEjEikA=="
+        crossorigin="anonymous"></script>
+    </style>
     <style>
         :root {
+            --grid-spacing-vertical: 0 !important;
+            --grid-spacing-horizontal: 0 !important;
             --form-element-spacing-vertical: 0.2rem !important;
             --form-element-spacing-horizontal: .25rem !important;
         }
 
-        html, body, [x-data=app] {
+        html,
+        body {
             height: 100%;
             min-height: 100%;
+            max-width: 100%;
+            /* background-color: #171b20; */
         }
 
         [x-data=app] {
@@ -25,58 +46,68 @@
             flex-direction: column;
             justify-content: space-between;
         }
+
+        [data-netdata] {
+            min-height: 16rem;
+        }
+
+        [data-type^=spark] {
+            min-height: 8rem;
+        }
     </style>
+    <script src="/utils.js"></script>
     <script src="/chart.js"></script>
     <script src="/index.js"></script>
 </head>
 
 <body>
-<div x-data="app">
-    <div class="netdata-charts">
-        <div class="grid">
-            <div>foo</div>
-            <div>bar</div>
+    <div x-data="app">
+        <div class="netdata-charts">
+            <div class="grid">
+                <div>foo</div>
+                <div>bar</div>
+            </div>
+            <div class="grid">
+                <div x-netdata data-type="line" data-metric="system.cpu" data-host="test001" data-max="100"
+                    style="width:100%; min-height: 280px"></div>
+                <div x-netdata data-metric="system.ram" data-host="test001" style="width:100%; min-height: 280px"></div>
+            </div>
         </div>
-        <div class="grid">
-            <div x-netdata data-metric="system.cpu" data-host="test001" style="width:100%; min-height: 280px"></div>
-            <div x-netdata data-metric="system.ram" data-host="test001" style="width:100%; min-height: 280px"></div>
+        <div class="netdata-controls">
+            <div>
+                <template x-bind="runStart">
+                    <span x-bind="runStartClick">
+                        <span class="fa fa-play"></span>
+                        Start
+                    </span>
+                </template>
+                <template x-bind="runStop">
+                    <span x-bind="runStopClick">
+                        <span class="fa fa-square"></span>
+                        Stop
+                    </span>
+                </template>
+                <span class="grid">
+                    <label>
+                        Duration:
+                        <input type="number" min="1" step="1" x-model="$store.app.duration" />
+                    </label>
+                    <label>
+                        From:
+                        <input type="datetime-local" step="1" x-model="$store.app.dateFrom" />
+                    </label>
+                    <label>
+                        Until:
+                        <input type="datetime-local" step="1" x-model="$store.app.dateUntil" />
+                    </label>
+                </span>
+            </div>
+            <div>
+                <code x-text="$store.app.running"></code>
+                <code x-text="$store.app.duration"></code>
+                <code x-text="$store.app.dateFrom"></code>
+                <code x-text="$store.app.dateUntil"></code>
+            </div>
         </div>
     </div>
-    <div class="netdata-controls">
-        <div>
-            <template x-bind="runStart">
-               <span x-bind="runStartClick">
-                  <span class="fa fa-play"></span>
-                  Start
-               </span>
-            </template>
-            <template x-bind="runStop">
-               <span x-bind="runStopClick">
-                  <span class="fa fa-square"></span>
-                  Stop
-               </span>
-            </template>
-            <span class="grid">
-               <label>
-                  Duration:
-                  <input type="number" min="1" step="1" x-model="$store.app.duration"/>
-               </label>
-               <label>
-                  From:
-                  <input type="datetime-local" step="1" x-model="$store.app.dateFrom"/>
-               </label>
-               <label>
-                  Until:
-                  <input type="datetime-local" step="1" x-model="$store.app.dateUntil"/>
-               </label>
-            </span>
-        </div>
-        <div>
-            <code x-text="$store.app.running"></code>
-            <code x-text="$store.app.duration"></code>
-            <code x-text="$store.app.dateFrom"></code>
-            <code x-text="$store.app.dateUntil"></code>
-        </div>
-    </div>
-</div>
 </body>
