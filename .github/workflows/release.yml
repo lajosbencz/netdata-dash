@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/386, windows/amd64, darwin/amd64, darwin/arm64
         cmd: [netdata-dash, netdata-dash-agent, netdata-dash-client]
         goos: [linux, windows, darwin]
         goarch: ["386", amd64, arm64]
@@ -24,13 +23,14 @@ jobs:
             goos: windows
     steps:
     - uses: actions/checkout@v3
-    - uses: wangyoucao577/go-release-action@efb9406897e4eff1aa2c7142223b096aec90f267 # v1.22
+    - uses: wangyoucao577/go-release-action@v1
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
-        goversion: "https://dl.google.com/go/go1.19.1.linux-amd64.tar.gz"
+        pre_command: export CGO_ENABLED=0 && export GODEBUG=http2client=0
         ldflags: "-s -w"
         project_path: ./cmd/${{ matrix.cmd }}
         binary_name: ${{ matrix.cmd }}
         extra_files: LICENSE README.md
+        asset_name: "${{ matrix.cmd }}-${{ matrix.goos }}-${{ matrix.goarch }}"
