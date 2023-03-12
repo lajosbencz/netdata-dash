@@ -7,12 +7,12 @@ on:
     types: [created]
 
 jobs:
-
   releases-matrix:
     name: Release Go binary
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/386, windows/amd64, darwin/amd64, darwin/arm64
         cmd: [netdata-dash, netdata-dash-agent, netdata-dash-client]
         goos: [linux, windows, darwin]
         goarch: ["386", amd64, arm64]
@@ -22,15 +22,25 @@ jobs:
           - goarch: arm64
             goos: windows
     steps:
-    - uses: actions/checkout@v3
-    - uses: wangyoucao577/go-release-action@v1
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        goos: ${{ matrix.goos }}
-        goarch: ${{ matrix.goarch }}
-        pre_command: export CGO_ENABLED=0 && export GODEBUG=http2client=0
-        ldflags: "-s -w"
-        project_path: ./cmd/${{ matrix.cmd }}
-        binary_name: ${{ matrix.cmd }}
-        extra_files: LICENSE README.md
-        asset_name: "${{ matrix.cmd }}-${{ matrix.goos }}-${{ matrix.goarch }}"
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.19"
+
+      - name: Dependencies
+        run: go get .
+
+      - name: Build
+        run: make ./dist/${{ matrix.cmd }}
+      
+      - name: Archive
+        run: tar cvzf ${{ matrix.cmd }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz dist/${{ matrix.cmd }}.tar.gz README.md LICENSE
+
+      - name: Artifact upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.cmd }}-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: ${{ matrix.cmd }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
