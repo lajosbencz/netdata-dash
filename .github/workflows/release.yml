@@ -37,7 +37,7 @@ jobs:
         run: make ./dist/${{ matrix.cmd }}
       
       - name: Archive
-        run: tar -cvzf ${{ matrix.cmd }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz dist/${{ matrix.cmd }}.tar.gz README.md LICENSE
+        run: tar -cvzf ${{ matrix.cmd }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz dist/${{ matrix.cmd }} README.md LICENSE
 
       - name: Artifact upload
         uses: actions/upload-artifact@v3
