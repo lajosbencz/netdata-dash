@@ -10,6 +10,7 @@ import (
 	"github.com/lajosbencz/netdata-dash/pkg/app"
 	"log"
 	"os"
+	"os/signal"
 	"time"
 )
 
@@ -65,26 +66,32 @@ func main() {
 		},
 	}
 
-	for {
-		wampClient, err := app.NewTlsClient(context.Background(), wampUrl, wampConfig)
-		if err != nil {
-			log.Println(err)
-		} else {
-			agentLogger := log.Default()
-			a, err := agent.NewAgent(agentConfig.HostName, agentConfig, wampClient, agentLogger)
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt)
+
+	go func() {
+		for {
+			wampClient, err := app.NewTlsClient(context.Background(), wampUrl, wampConfig)
 			if err != nil {
 				log.Println(err)
 			} else {
-				if err := a.Run(); err != nil {
+				agentLogger := log.Default()
+				a, err := agent.NewAgent(agentConfig.HostName, agentConfig, wampClient, agentLogger)
+				if err != nil {
 					log.Println(err)
-				}
-				if err := wampClient.Close(); err != nil {
-					log.Println(err)
+				} else {
+					if err := a.Run(); err != nil {
+						log.Println(err)
+					}
+					if err := wampClient.Close(); err != nil {
+						log.Println(err)
+					}
 				}
 			}
-		}
 
-		time.Sleep(time.Second * 5)
-		log.Println("retrying connection...")
-	}
+			time.Sleep(time.Second * 5)
+			log.Println("retrying connection...")
+		}
+	}()
+	<-shutdown
 }

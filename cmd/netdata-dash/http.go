@@ -54,10 +54,6 @@ func newHttp() (*myHttp, error) {
 func (t *myHttp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 	if path == "/" || path == "/index.html" {
-		dirs, _ := templateEmbed.ReadDir("template")
-		for _, d := range dirs {
-			log.Println(d.Name())
-		}
 		if err := t.tplIndex.ExecuteWriter(pongo2.Context{}, w); err != nil {
 			// http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Println(err)
@@ -69,8 +65,6 @@ func (t *myHttp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if tvPath == "/" {
 			tvPath += "index.html"
 		}
-		cwd, _ := os.Getwd()
-		log.Println(cwd, tvDir+tvPath)
 		content, err := os.ReadFile("./" + tvDir + tvPath)
 		if err != nil {
 			if os.IsNotExist(err) {

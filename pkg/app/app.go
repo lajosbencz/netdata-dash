@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"log"
 	"os"
 	"time"
 
@@ -24,11 +25,11 @@ func NewApp(wampClient *client.Client) *App {
 	}
 }
 
-func (r App) Agents() map[wamp.ID]string {
+func (r *App) Agents() map[wamp.ID]string {
 	return r.agents
 }
 
-func (r App) AgentHosts() []string {
+func (r *App) AgentHosts() []string {
 	strList := utils.StringsUnique{}
 	for _, v := range r.agents {
 		if str, ok := wamp.AsString(v); ok {
@@ -44,11 +45,15 @@ func (r *App) onSessionJoin(event *wamp.Event) {
 			sessionID, _ := wamp.AsID(details["session"])
 			if hostName, ok := wamp.AsString(details[agent.HostnameKey]); ok {
 				r.agents[sessionID] = hostName
-				r.wampClient.Publish(core.TopicHostJoin, wamp.Dict{}, wamp.List{}, wamp.Dict{
+				if err := r.wampClient.Publish(core.TopicHostJoin, wamp.Dict{}, wamp.List{}, wamp.Dict{
 					agent.HostnameKey: hostName,
-				})
+				}); err != nil {
+					log.Println(err)
+				}
 				if wampList, ok := wamp.AsList(r.AgentHosts()); ok {
-					r.wampClient.Publish(core.TopicHostList, wamp.Dict{}, wampList, nil)
+					if err := r.wampClient.Publish(core.TopicHostList, wamp.Dict{}, wampList, nil); err != nil {
+						log.Println(err)
+					}
 				}
 			}
 		}
@@ -78,7 +83,9 @@ func (r *App) RunLoop(shutdown chan os.Signal) error {
 	if err := r.wampClient.Subscribe(string(wamp.MetaEventSessionOnLeave), r.onSessionLeave, nil); err != nil {
 		return err
 	}
-	r.wampClient.Register(core.TopicHostList, r.RpcHosts, wamp.Dict{wamp.OptDiscloseCaller: true})
+	if err := r.wampClient.Register(core.TopicHostList, r.RpcHosts, wamp.Dict{wamp.OptDiscloseCaller: true}); err != nil {
+		return err
+	}
 
 	dataTicker := time.NewTicker(1 * time.Second)
 out:

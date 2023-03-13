@@ -2,7 +2,7 @@
 
 const NETDATA_DEFAULTS = {
     autoStart: true,
-    WAMP_ADDRESS: "wss://localhost:16666/ws/",
+    WAMP_ADDRESS: "wss://" + location.host + "/ws/",
     WAMP_REALM: "netdata",
     FORMAT_DATETIME: (dt) => {
         return (new Date(dt)).toISOString().substring(0, 19)
@@ -70,6 +70,7 @@ window.NETDATA = Object.assign({}, NETDATA_DEFAULTS, window.NETDATA || {});
             duration: 600,
             dateFrom: undefined,
             dateUntil: undefined,
+            hosts: [],
         })
         const appStore = Alpine.store('app')
         appStore.dateFrom = NETDATA.FORMAT_DATETIME(new Date((Date.now() - appStore.duration)))
@@ -154,6 +155,14 @@ window.NETDATA = Object.assign({}, NETDATA_DEFAULTS, window.NETDATA || {});
     document.addEventListener('alpine:initialized', async () => {
         Alpine.effect(wampConnect)
         wampConnect()
+
+        const wamp = await deferWampSession
+        const appStore = Alpine.store('app')
+        wamp.subscribe('host.list', (args) => {
+            appStore.hosts = args
+        })
+        const {kwargs: {list}} = await wamp.call('host.list')
+        appStore.hosts = list
     })
     
 })()

@@ -32,5 +32,10 @@
         <code x-text="$store.app.duration"></code>
         <code x-text="$store.app.dateFrom"></code>
         <code x-text="$store.app.dateUntil"></code>
+        <hr/>
+        Hosts:
+        <template x-for="host in $store.app.hosts">
+            <code x-text="host"></code>
+        </template>
     </div>
 </div>

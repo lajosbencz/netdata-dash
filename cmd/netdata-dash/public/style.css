@@ -19,6 +19,7 @@ body {
     justify-content: space-between;
 }
 
+[x-netdata],
 [data-netdata] {
     min-height: 16rem;
 }
