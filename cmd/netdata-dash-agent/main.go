@@ -4,14 +4,13 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
-	"os"
-
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/wamp"
-
 	"github.com/lajosbencz/netdata-dash/pkg/agent"
 	"github.com/lajosbencz/netdata-dash/pkg/app"
+	"log"
+	"os"
+	"time"
 )
 
 const (
@@ -65,19 +64,27 @@ func main() {
 			},
 		},
 	}
-	wampClient, err := app.NewTlsClient(context.Background(), wampUrl, wampConfig)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer wampClient.Close()
 
-	agentLogger := log.Default()
-	a, err := agent.NewAgent(agentConfig.HostName, agentConfig, wampClient, agentLogger)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	for {
+		wampClient, err := app.NewTlsClient(context.Background(), wampUrl, wampConfig)
+		if err != nil {
+			log.Println(err)
+		} else {
+			agentLogger := log.Default()
+			a, err := agent.NewAgent(agentConfig.HostName, agentConfig, wampClient, agentLogger)
+			if err != nil {
+				log.Println(err)
+			} else {
+				if err := a.Run(); err != nil {
+					log.Println(err)
+				}
+				if err := wampClient.Close(); err != nil {
+					log.Println(err)
+				}
+			}
+		}
 
-	if err := a.Run(); err != nil {
-		log.Println(err)
+		time.Sleep(time.Second * 5)
+		log.Println("retrying connection...")
 	}
 }
