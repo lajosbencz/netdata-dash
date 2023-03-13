@@ -1,5 +1,8 @@
-<div class="grid">
-    <div x-netdata data-type="line" data-metric="system.cpu" data-host="test001" data-max="100"
-        style="width:100%; min-height: 280px"></div>
-    <div x-netdata data-metric="system.ram" data-host="test001" style="width:100%; min-height: 280px"></div>
-</div>
+<template x-for="host in $store.app.hosts">
+    <div :data-host="host">
+        <div class="grid">
+            <div x-netdata data-metric="system.cpu" data-type="line" data-max="100"></div>
+            <div x-netdata data-metric="system.ram"></div>
+        </div>
+    </div>
+</template>

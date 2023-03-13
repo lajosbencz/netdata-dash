@@ -1,0 +1,9 @@
+title: Action-Information Centre
+charts:
+    - host: test001
+      metric: system.cpu
+      type: line
+      max: 100
+    - host: test001
+      metric: system.ram
+      type: line

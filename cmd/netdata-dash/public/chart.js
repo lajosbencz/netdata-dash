@@ -175,24 +175,6 @@ class Chart {
 
         Chart.ResizeListen(this.chart.resize)
 
-        const observeNodeRemoved = (node, callback) => {
-            const o = new MutationObserver(function (ms) {
-                ms.forEach(function (m) {
-                    m.removedNodes.forEach(function (n) {
-                        if (n === node) {
-                            try {
-                                callback()
-                            }
-                            catch (e) {
-                                console.error(e)
-                            }
-                            o.disconnect()
-                        }
-                    })
-                })
-            })
-            o.observe(node.parentNode, { subtree: false, childList: true })
-        }
         observeNodeRemoved(el, this.dispose)
     }
     dispose() {
