@@ -8,7 +8,6 @@ on:
     types: [created]
 
 jobs:
-
   releases-matrix:
     name: Release Go binary
     runs-on: ubuntu-latest
@@ -24,14 +23,14 @@ jobs:
           - goarch: arm64
             goos: windows
     steps:
-    - uses: actions/checkout@v3
-    - uses: wangyoucao577/go-release-action@v1
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        goos: ${{ matrix.goos }}
-        goarch: ${{ matrix.goarch }}
-        pre_command: export CGO_ENABLED=0 && export GODEBUG=http2client=0
-        ldflags: "-s -w"
-        project_path: ./cmd/${{ matrix.cmd }}
-        binary_name: ${{ matrix.cmd }}
-        extra_files: LICENSE README.md
+      - uses: actions/checkout@v3
+      - uses: wangyoucao577/go-release-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          pre_command: export CGO_ENABLED=0 && export GODEBUG=http2client=0
+          ldflags: "-s -w"
+          project_path: ./cmd/${{ matrix.cmd }}
+          binary_name: ${{ matrix.cmd }}
+          extra_files: LICENSE README.md

@@ -6,8 +6,11 @@ on:
     types: [created]
 
 jobs:
-  docker:
+  releases-matrix:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cmd: [netdata-dash, netdata-dash-agent, netdata-dash-client]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -37,6 +40,8 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
+          build-args: |
+            cmd=${{ matrix.cmd }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
