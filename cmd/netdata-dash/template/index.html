@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <title>Netdata AIC {{ '@ django!' }}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/vendor/pico.min.css">
+    <link rel="stylesheet" href="/vendor/font-awesome.min.css">
+    <link rel="stylesheet" href="/style.css">
+    <script src="/vendor/autobahn.min.js"></script>
+    <script src="/vendor/echarts.min.js"></script>
+    <script src="/vendor/alpinejs.min.js" defer></script>
+    <script src="/utils.js"></script>
+    <script src="/chart.js"></script>
+    <script src="/index.js"></script>
+</head>
+
+<body>
+    <div x-data="app">
+
+        <!-- header open -->
+        {% block header %}
+        {% endblock %}
+        <!-- header close -->
+
+        <!-- charts open -->
+        <div class="netdata-charts">
+            {% block charts %}
+            {% include "template/charts.html" %}
+            {% endblock %}
+        </div>
+        <!-- charts close -->
+
+        <!-- controls open -->
+        {% block controls %}
+        {% include "template/controls.html" %}
+        <!-- controls close -->
+
+        <!-- footer open-->
+        {% endblock %}
+        {% block footer %}
+        {% endblock %}
+        <!-- footer close -->
+
+    </div>
+</body>

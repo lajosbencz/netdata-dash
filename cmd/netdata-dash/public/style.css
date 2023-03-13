@@ -1,0 +1,28 @@
+:root {
+    --grid-spacing-vertical: 0 !important;
+    --grid-spacing-horizontal: 0 !important;
+    --form-element-spacing-vertical: 0.2rem !important;
+    --form-element-spacing-horizontal: .25rem !important;
+}
+
+html,
+body {
+    height: 100%;
+    min-height: 100%;
+    max-width: 100%;
+    /* background-color: #171b20; */
+}
+
+[x-data=app] {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+[data-netdata] {
+    min-height: 16rem;
+}
+
+[data-type^=spark] {
+    min-height: 8rem;
+}

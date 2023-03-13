@@ -10,6 +10,7 @@ require (
 
 require (
 	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/nathan-osman/pongo2-embed-loader v1.0.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/crypto v0.7.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect

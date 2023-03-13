@@ -1,0 +1,36 @@
+<div class="netdata-controls">
+    <div>
+        <template x-bind="runStart">
+            <span x-bind="runStartClick">
+                <span class="fa fa-play"></span>
+                Start
+            </span>
+        </template>
+        <template x-bind="runStop">
+            <span x-bind="runStopClick">
+                <span class="fa fa-square"></span>
+                Stop
+            </span>
+        </template>
+        <span class="grid">
+            <label>
+                Duration:
+                <input type="number" min="1" step="1" x-model="$store.app.duration" />
+            </label>
+            <label>
+                From:
+                <input type="datetime-local" step="1" x-model="$store.app.dateFrom" />
+            </label>
+            <label>
+                Until:
+                <input type="datetime-local" step="1" x-model="$store.app.dateUntil" />
+            </label>
+        </span>
+    </div>
+    <div>
+        <code x-text="$store.app.running"></code>
+        <code x-text="$store.app.duration"></code>
+        <code x-text="$store.app.dateFrom"></code>
+        <code x-text="$store.app.dateUntil"></code>
+    </div>
+</div>

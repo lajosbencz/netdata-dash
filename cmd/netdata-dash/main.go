@@ -40,7 +40,11 @@ func main() {
 	httpRouter := http.NewServeMux()
 
 	httpRouter.Handle("/ws/", wampServer)
-	httpRouter.HandleFunc("/", newHttp())
+	muxIndex, err := newHttp()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	httpRouter.Handle("/", muxIndex)
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
