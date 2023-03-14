@@ -1,6 +1,6 @@
 <template x-for="host in $store.app.hosts">
-    <div data-host="localhost">
-        <h1>{{ host }}</h1>
+    <div :data-host="host">
+        <h1 x-text="host"></h1>
         <div class="grid">
             <div>
                 <div x-netdata data-metric="system.cpu" data-type="pie" data-max="100"></div>

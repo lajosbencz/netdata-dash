@@ -103,7 +103,7 @@ window.NETDATA = Object.assign({}, NETDATA_DEFAULTS, window.NETDATA || {});
                 metric: undefined,
                 host: 'localhost',
                 type: 'line',
-                after: -10,
+                after: -600,
                 before: 0,
                 stack: undefined,
                 smooth: undefined,

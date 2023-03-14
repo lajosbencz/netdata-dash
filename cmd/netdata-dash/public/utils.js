@@ -1,17 +1,19 @@
-/**
- * Simple object check.
- * @param item
- * @returns {boolean}
- */
+String.prototype.hashCode = function () {
+    var hash = 0,
+        i, chr;
+    if (this.length === 0) return hash;
+    for (i = 0; i < this.length; i++) {
+        chr = this.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+}
+
 const isObject = (item) => {
     return (item && typeof item === 'object' && !Array.isArray(item));
 }
 
-/**
- * Deep merge two objects.
- * @param target
- * @param ...sources
- */
 const mergeDeep = (target, ...sources) => {
     if (!sources.length) return target;
     const source = sources.shift();
@@ -26,18 +28,6 @@ const mergeDeep = (target, ...sources) => {
         }
     }
     return mergeDeep(target, ...sources);
-}
-
-String.prototype.hashCode = function () {
-    var hash = 0,
-        i, chr;
-    if (this.length === 0) return hash;
-    for (i = 0; i < this.length; i++) {
-        chr = this.charCodeAt(i);
-        hash = ((hash << 5) - hash) + chr;
-        hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
 }
 
 const defer = () => {
@@ -89,33 +79,14 @@ const smartFormatDate = (dt) => {
     return str
 }
 
-// const requireTag = (el, src, integrity, appendToBody) => {
-//     const id = src.toString().hashCode()
-//     if (document.getElementById(id) !== null) {
-//         return
-//     }
-//     el.setAttribute('id', id);
-//     el.setAttribute('referrerpolicy', 'no-referrer')
-//     el.setAttribute('crossorigin', 'anonymous');
-//     if (integrity) {
-//         el.setAttribute('integrity', integrity)
-//     }
-//     (document.getElementsByTagName(!appendToBody ? 'head' : 'body')[0]).appendChild(el)
-// }
+const formatBytes = (bytes, decimals = 2) => {
+    if (!+bytes) return '0 Bytes'
 
-// const requireJs = (src, integrity, appendToBody) => {
-//     const d = defer()
-//     const el = document.createElement('script')
-//     el.setAttribute('type', 'text/javascript')
-//     el.setAttribute('src', src)
-//     el.addEventListener('load', d.resolve)
-//     requireTag(el, src, integrity, appendToBody)
-//     return d
-// }
+    const k = 1024
+    const dm = decimals < 0 ? 0 : decimals
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
-// const requireStyle = (src, integrity) => {
-//     const el = document.createElement('link')
-//     el.setAttribute('href', src)
-//     el.setAttribute('rel', 'stylesheet')
-//     requireTag(el, src, integrity, false)
-// }
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+}
