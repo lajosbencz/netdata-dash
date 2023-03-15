@@ -18,15 +18,18 @@ func (r Address) Format() string {
 }
 
 type Config struct {
+	Debug    bool                `json:"debug,omitempty"`
 	HostName string              `json:"hostname,omitempty"`
 	HostTags utils.StringsUnique `json:"host_tags,omitempty"`
 	Realm    string              `json:"realm,omitempty"`
+	User     string              `json:"user,omitempty"`
+	Secret   string              `json:"secret,omitempty"`
 	Dash     Address             `json:"dash,omitempty"`
 	Netdata  Address             `json:"netdata,omitempty"`
 }
 
 func DefaultConfig() *Config {
-	return &Config{
+	cfg := &Config{
 		HostName: "localhost",
 		HostTags: utils.StringsUnique{},
 		Realm:    "netdata",
@@ -39,6 +42,10 @@ func DefaultConfig() *Config {
 			Port: 19999,
 		},
 	}
+	if osHostname, err := os.Hostname(); err == nil {
+		cfg.HostName = osHostname
+	}
+	return cfg
 }
 
 func (r *Config) FromFile(jsonPath string) error {

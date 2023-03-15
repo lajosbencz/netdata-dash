@@ -8,7 +8,6 @@ import (
 
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/wamp"
-	"github.com/lajosbencz/netdata-dash/pkg/agent"
 	"github.com/lajosbencz/netdata-dash/pkg/core"
 	"github.com/lajosbencz/netdata-dash/pkg/utils"
 )
@@ -43,10 +42,10 @@ func (r *App) onSessionJoin(event *wamp.Event) {
 	if len(event.Arguments) != 0 {
 		if details, ok := wamp.AsDict(event.Arguments[0]); ok {
 			sessionID, _ := wamp.AsID(details["session"])
-			if hostName, ok := wamp.AsString(details[agent.HostnameKey]); ok {
+			if hostName, ok := wamp.AsString(details[core.AgentHostnameKey]); ok {
 				r.agents[sessionID] = hostName
 				if err := r.wampClient.Publish(core.TopicHostJoin, wamp.Dict{}, wamp.List{}, wamp.Dict{
-					agent.HostnameKey: hostName,
+					core.AgentHostnameKey: hostName,
 				}); err != nil {
 					log.Println(err)
 				}
@@ -66,7 +65,7 @@ func (r *App) onSessionLeave(event *wamp.Event) {
 			if hostName, in := r.agents[sessionID]; in {
 				delete(r.agents, sessionID)
 				r.wampClient.Publish(core.TopicHostLeave, wamp.Dict{}, wamp.List{}, wamp.Dict{
-					agent.HostnameKey: hostName,
+					core.AgentHostnameKey: hostName,
 				})
 				if wampList, ok := wamp.AsList(r.AgentHosts()); ok {
 					r.wampClient.Publish(core.TopicHostList, wamp.Dict{}, wampList, nil)

@@ -3,15 +3,13 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
-	"github.com/gammazero/nexus/v3/client"
-	"github.com/gammazero/nexus/v3/wamp"
-	"github.com/lajosbencz/netdata-dash/pkg/agent"
-	"github.com/lajosbencz/netdata-dash/pkg/app"
 	"log"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/lajosbencz/netdata-dash/pkg/agent"
+	"github.com/lajosbencz/netdata-dash/pkg/core"
 )
 
 const (
@@ -25,10 +23,8 @@ func main() {
 	verboseOutput := false
 	configPath := defaultConfigPath
 	agentConfig := agent.DefaultConfig()
-	if osHostname, err := os.Hostname(); err == nil {
-		agentConfig.HostName = osHostname
-	}
-	flag.StringVar(&authUser, "u", "", "Auth user")
+
+	flag.StringVar(&authUser, "u", core.AgentRole, "Auth user")
 	flag.StringVar(&authPassword, "p", "", "Auth password")
 	flag.StringVar(&configPath, "config", configPath, "Path of config file")
 	flag.StringVar(&agentConfig.HostName, "hostname", agentConfig.HostName, "Overwrite registration hostname (useful for debugging)")
@@ -41,29 +37,12 @@ func main() {
 	flag.BoolVar(&verboseOutput, "vv", verboseOutput, "Verbose output")
 	flag.Parse()
 
-	if authUser == "" || authPassword == "" {
-		log.Fatalln("no auth credentials provided (-u -)")
+	if authPassword == "" {
+		log.Fatalln("no auth credentials provided (-p)")
 	}
 
 	if err := agentConfig.FromFile(configPath); err != nil && (!os.IsNotExist(err) || configPath != defaultConfigPath) {
 		log.Fatalln(err)
-	}
-
-	wampUrl := fmt.Sprintf("https://%s/ws/", agentConfig.Dash.Format())
-	wampConfig := client.Config{
-		Realm:         agentConfig.Realm,
-		Debug:         verboseOutput,
-		Logger:        log.Default(),
-		Serialization: client.MSGPACK,
-		HelloDetails: wamp.Dict{
-			"authid":          authUser,
-			agent.HostnameKey: agentConfig.HostName,
-		},
-		AuthHandlers: map[string]client.AuthFunc{
-			"ticket": func(challenge *wamp.Challenge) (signature string, details wamp.Dict) {
-				return authPassword, wamp.Dict{}
-			},
-		},
 	}
 
 	shutdown := make(chan os.Signal, 1)
@@ -71,7 +50,7 @@ func main() {
 
 	go func() {
 		for {
-			wampClient, err := app.NewTlsClient(context.Background(), wampUrl, wampConfig)
+			wampClient, err := agent.NewClient(context.Background(), agentConfig)
 			if err != nil {
 				log.Println(err)
 			} else {

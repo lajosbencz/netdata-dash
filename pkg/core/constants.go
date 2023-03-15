@@ -1,6 +1,9 @@
 package core
 
 const (
+	AgentHostnameKey = "hostname"
+	AgentRole        = "agent"
+
 	TopicPartDelimiter = "._."
 
 	TopicHostList            = "host.list"

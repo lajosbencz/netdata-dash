@@ -11,6 +11,7 @@ import (
 	"github.com/gammazero/nexus/v3/router/auth"
 	"github.com/gammazero/nexus/v3/stdlog"
 	"github.com/gammazero/nexus/v3/wamp"
+	"github.com/lajosbencz/netdata-dash/pkg/core"
 )
 
 func newWamp(realm string, logger stdlog.StdLog) (router.Router, *client.Client, *router.WebsocketServer, error) {
@@ -27,7 +28,7 @@ func newWamp(realm string, logger stdlog.StdLog) (router.Router, *client.Client,
 				AnonymousAuth:  true,
 				AllowDisclose:  true,
 				Authenticators: []auth.Authenticator{crAuth},
-				Authorizer:     &authz{"agent"},
+				Authorizer:     &authz{core.AgentRole},
 			},
 		},
 	}
